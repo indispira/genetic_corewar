@@ -1,6 +1,4 @@
 __pycache__/
-*.cor
-*.s
 pops/
 childs/
 score_of_some_refs
