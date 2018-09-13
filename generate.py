@@ -145,27 +145,6 @@ def op_lfork(length):
   op = 'lfork\t%' + ind() + '\n'
   return op, length + 3
 
-
-op_all = [op_live, op_ld, op_st, op_add, op_sub, op_and, op_or, op_xor,
-          op_zjmp, op_ldi, op_sti, op_fork, op_lld, op_lldi, op_lfork]
-
-ops = []
-ops.append(op_and)
-ops.append(op_sub)
-ops.append(op_ldi)
-ops.append(op_xor)
-for i in range(38):
-  if i <= 2:
-    ops.append(op_or)
-    ops.append(op_add)
-  if i <= 6: ops.append(op_fork)
-  if i <= 7: ops.append(op_sti)
-  if i <= 9: ops.append(op_zjmp)
-  if i <= 10: ops.append(op_lfork)
-  if i <= 20: ops.append(op_ld)
-  if i <= 28: ops.append(op_live)
-  if i <= 38: ops.append(op_st)
-
 def initiate_ops_all():
   return [op_live, op_ld, op_st, op_add, op_sub, op_and, op_or, op_xor,
           op_zjmp, op_ldi, op_sti, op_fork, op_lld, op_lldi, op_lfork]
@@ -189,13 +168,14 @@ def initiate_ops_meta():
     if i <= 38: ops.append(op_st)
   return ops
 
+ops = initiate_ops_meta()
+
 def random_op(length):
   return ops[random.randint(0, len(ops) - 1)](length)
 
 def generate_random(folder):
   name = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=40))
   length = 0
-  # ops = initiate_ops_meta()
 
   # Generate the .s file
   with open(folder + '/' + name + '.s', 'w') as f:
@@ -214,14 +194,6 @@ def generate_random(folder):
   res = subprocess.Popen(args, stdout=PIPE)
   res = res.communicate()[0].decode('utf-8').split('\n')
 
-  # Move .s file
-  # shutil.move(folder + '/' + name + '.cor', 'test/' + name + '.cor')
-  # if evaluate_test(name):
-  # if True:
-    # shutil.move('test/' + name + '.cor', folder + '/' + name + '.cor')
+  # Move .s file to the archives
   shutil.move(folder + '/' + name + '.s', 'newbies/' + name + '.s')
-    # print('Someone is born')
   return True
-  # os.remove('test/' + name + '.cor')
-  # os.remove(folder + '/' + name + '.s')
-  # return False

@@ -61,11 +61,25 @@ def evaluate_reference(folder):
     print(k)
   return scores
 
-  # for k in scores:
-  #   print(k)
-  #   if k[1] == len(ref):
-  #     return True
-  # return False
+def evaluate_all_refs(name):
+  score = 0
+  ref, _ = get_population('stock')
+  nb = 1
+  before = time.time()
+  p1 = folder + '/' + name
+  for r in ref:
+    p2 = 'stock/' + r
+    res = launch_evaluation(p1, p2)
+    if res[-2][11] == '1':
+      score += 1
+    nb += 1
+
+  print('Evaluations against all references done in', time.time() - before, 'seconds')
+  print('The Score of the actual champion is', score)
+
+    if score == len(ref):
+      return True
+  return False
 
 def evaluate_test(name):
   res = launch_evaluation('test/' + name + '.cor', 'base.cor')

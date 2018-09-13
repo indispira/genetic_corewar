@@ -18,37 +18,44 @@ childs = 0.3 * size_pop
 init_time = time.time()
 step = 0
 folder = 'pops/pop0'
+
+# Generate the first population if needed
 old_pop = len(os.listdir(folder))
 for i in range(size_pop - old_pop):
-  while generate_random(folder) is False:
-    pass
+  generate_random(folder)
 
 # Loop for training
 for i in range(epochs):
   epoch_time = time.time()
   folder = 'pops/pop' + str(i)
-  # Transfer of the population
+
+  # Transfer of the population to the next
   if i != 0:
     shutil.copytree('pops/pop' + str(i - 1), folder)
+
   # Evaluate the population
   results = evaluate_reference(folder)
+
   # Delete the losers
   for j, k in enumerate(results):
     if j == int(remove):
       break
     os.remove(folder + '/' + k[0])
-  # Evaluate against references to stop
-  # if evaluate_reference(folder):
-  #   print('Reference score obtained')
-  #   break
+
+  # Evaluate against all references of champions to stop
+  if evaluate_all_refs(results[-1][0]):
+    print('Reference score obtained')
+    break
+
   # Reproduct the best ones
   reproduct(folder, childs)
+
   # Mutate some childs
   mutate(folder)
   # Add some fresh generated
   for j in range(int(newbies)):
-    while generate_random(folder) is False:
-      pass
-  print('Epoch', i, 'computed in', time.time() - epoch_time, 'seconds')
+    generate_random(folder)
 
+  print('Epoch', i, 'computed in', time.time() - epoch_time, 'seconds')
 print('Training computed in', time.time() - init_time, 'seconds')
+print('Champion generated:', results[-1][0])
