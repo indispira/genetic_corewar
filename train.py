@@ -5,7 +5,7 @@ import shutil
 from mutation import mutate
 from reproduction import reproduct
 from generate import generate_random
-from evaluate import evaluate_active, evaluate_reference
+from evaluate import evaluate_active, evaluate_reference, evaluate_all_refs, evaluate_cycles
 
 size_pop = 1000
 epochs = 2000
@@ -34,7 +34,7 @@ for i in range(epochs):
     shutil.copytree('pops/pop' + str(i - 1), folder)
 
   # Evaluate the population
-  results = evaluate_reference(folder)
+  results = evaluate_cycles(folder)
 
   # Delete the losers
   for j, k in enumerate(results):
@@ -43,7 +43,7 @@ for i in range(epochs):
     os.remove(folder + '/' + k[0])
 
   # Evaluate against all references of champions to stop
-  if evaluate_all_refs(results[-1][0]):
+  if evaluate_all_refs(folder, results[-1][0]):
     print('Reference score obtained')
     break
 
