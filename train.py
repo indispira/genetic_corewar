@@ -9,6 +9,7 @@ from evaluate import evaluate_active, evaluate_reference, evaluate_all_refs, eva
 
 size_pop = 1000
 epochs = 2000
+evaluate_function = evaluate_reference
 
 newbies = 0.1 * size_pop
 remove = 0.7 * size_pop
@@ -34,7 +35,7 @@ for i in range(epochs):
     shutil.copytree('pops/pop' + str(i - 1), folder)
 
   # Evaluate the population
-  results = evaluate_cycles(folder)
+  results = evaluate_function(folder)
 
   # Delete the losers
   for j, k in enumerate(results):

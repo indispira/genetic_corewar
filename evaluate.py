@@ -27,7 +27,6 @@ def get_population(folder):
 
 def evaluate_active(folder):
   pop, scores = get_population(folder)  
-  nb = 1
   before = time.time()
   for i, p in enumerate(pop):
     p1 = folder + '/' + p
@@ -39,7 +38,6 @@ def evaluate_active(folder):
         scores[p1[len(folder) + 1:]] += 1
       else:
         scores[p2[len(folder) + 1:]] += 1
-      nb += 1
       j += 1
 
   scores = [(k, scores[k]) for k in sorted(scores, key=scores.get)]
@@ -49,7 +47,6 @@ def evaluate_active(folder):
 def evaluate_cycles(folder):
   pop, scores = get_population(folder)
   ref, _ = get_population('refs')
-  nb = 1
   before = time.time()
   for p in pop:
     p1 = folder + '/' + p
@@ -61,19 +58,18 @@ def evaluate_cycles(folder):
       else:
         text = res[-2].split(' ')
         scores[p1[len(folder) + 1:]] += int(text[-1])
-      nb += 1
 
   scores = [(k, scores[k]) for k in sorted(scores, key=scores.get)]
   print('Evaluations against reference done in', time.time() - before, 'seconds')
 
-  for k in scores:
-    print(k)
+  print(k[-10:])
+  # for k in scores:
+  #   print(k)
   return scores
 
 def evaluate_reference(folder):
   pop, scores = get_population(folder)
   ref, _ = get_population('refs')
-  nb = 1
   before = time.time()
   for p in pop:
     p1 = folder + '/' + p
@@ -82,19 +78,18 @@ def evaluate_reference(folder):
       res = launch_evaluation(p1, p2)
       if res[-1][11] == '1':
         scores[p1[len(folder) + 1:]] += 1
-      nb += 1
 
   scores = [(k, scores[k]) for k in sorted(scores, key=scores.get)]
   print('Evaluations against reference done in', time.time() - before, 'seconds')
 
-  for k in scores:
-    print(k)
+  print(k[-10:])
+  # for k in scores:
+  #   print(k)
   return scores
 
 def evaluate_all_refs(folder, name):
   score = 0
   ref, _ = get_population('stock')
-  nb = 1
   before = time.time()
   p1 = folder + '/' + name
   for r in ref:
@@ -102,7 +97,6 @@ def evaluate_all_refs(folder, name):
     res = launch_evaluation(p1, p2)
     if res[-1][11] == '1':
       score += 1
-    nb += 1
 
   print('Evaluations against all references done in', time.time() - before, 'seconds')
   print('The Score of the actual champion is', score)
