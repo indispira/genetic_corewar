@@ -62,7 +62,7 @@ def evaluate_cycles(folder):
   scores = [(k, scores[k]) for k in sorted(scores, key=scores.get)]
   print('Evaluations against reference done in', time.time() - before, 'seconds')
 
-  print(k[-10:])
+  print(scores[-10:])
   # for k in scores:
   #   print(k)
   return scores
@@ -82,7 +82,7 @@ def evaluate_reference(folder):
   scores = [(k, scores[k]) for k in sorted(scores, key=scores.get)]
   print('Evaluations against reference done in', time.time() - before, 'seconds')
 
-  print(k[-10:])
+  print(scores[-10:])
   # for k in scores:
   #   print(k)
   return scores
