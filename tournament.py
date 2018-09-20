@@ -7,7 +7,7 @@ from generate import generate_random
 from reproduction import reproduct_v2
 
 # Fixed variables for the train
-size_pop = 80
+size_pop = 800
 epochs = 2000
 pools = 8
 stock = os.listdir('stock')
