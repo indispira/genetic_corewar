@@ -9,6 +9,7 @@ from evaluate import evaluate_test
 from subprocess import Popen, PIPE
 
 size_max = 650
+size_min = 400
 
 def reg():
   return str(random.randint(1, 16))
@@ -184,7 +185,7 @@ def generate_random(folder):
     op, length = random_op(length)
     f.write(op)
 
-    while length < size_max and random.randint(0, 30):
+    while length < size_min or (length < size_max and random.randint(0, 30)):
       op, length = random_op(length)
       f.write(op)
 
