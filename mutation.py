@@ -50,3 +50,13 @@ def mutate(folder):
     # Move the childs in the right folder
     shutil.move('childs/' + c, 'newbies/' + c)
     shutil.move('childs/' + c[:-1] + 'cor', folder + '/' + c[:-1] + 'cor')
+
+def mutate_v2(start, end):
+  for l in start:
+    if random.randint(0, 50) == 0:
+      l = shuffle_numbers(l)
+  for l in end:
+    if random.randint(0, 50) == 0:
+      l = shuffle_numbers(l)
+
+  return start, end
