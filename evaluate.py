@@ -6,7 +6,7 @@ import subprocess
 
 from threading import Timer
 from subprocess import Popen, PIPE
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 
 def launch_evaluation(p1, p2):
   cmd = './corewar ' + p1 + ' ' + p2
@@ -100,23 +100,38 @@ def evaluate_reference(folder):
   #   print(k)
   return scores
 
-def evaluate_stock(folder):
-  pop, scores = get_population(folder)
-  ref, _ = get_population('refs')
-  before = time.time()
+def each_stock(folder, pop, scores):
+  stk, _ = get_population('stock')
   for p in pop:
+    scores[p] = 0
     p1 = folder + '/' + p
-    for r in ref:
-      p2 = 'refs/' + r
+    for s in stk:
+      p2 = 'stock/' + s
       res = launch_evaluation_timeout(p1, p2, 5)
       if len(res) and res[-1][11] == '1':
-        scores[p1[len(folder) + 1:]] += 1
+        scores[p] += 1
 
-  scores = [(k, scores[k]) for k in sorted(scores, key=scores.get)]
-  print('Evaluations against reference done in', time.time() - before, 'seconds')
+def evaluate_stock(folder, pools):
+  pop, scores = get_population(folder)
+  ref, _ = get_population('stock')
+  batch = len(pop) / pools
+  processes = []
+  with Manager() as manager:
+    scores = manager.dict()
+    before = time.time()
+    for i in range(pools):
+      p = Process(target=each_stock, args=(folder, pop[int(i * batch):int((i + 1) * batch)], scores,))
+      processes.append(p)
+      p.start()
 
-  print(scores[-10:])
-  return scores
+    for p in processes:
+      p.join()
+
+    result = sorted([(k, v) for k, v in scores.items()], key=lambda x: x[1])
+  # print('Evaluations against all stock done in', time.time() - before, 'seconds')
+
+  # print(result[-10:])
+  return result
 
 def evaluate_one_vs_stock(folder, name):
   score = 0
