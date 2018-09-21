@@ -111,7 +111,7 @@ def each_stock(folder, pop, scores):
       if len(res) and res[-1][11] == '1':
         scores[p] += 1
 
-def evaluate_stock(folder, pools):
+def evaluate_stock(folder, pools, remove=0):
   pop, scores = get_population(folder)
   ref, _ = get_population('stock')
   batch = len(pop) / pools
@@ -130,6 +130,12 @@ def evaluate_stock(folder, pools):
     result = sorted([(k, v) for k, v in scores.items()], key=lambda x: x[1])
   # print('Evaluations against all stock done in', time.time() - before, 'seconds')
 
+  # If no pool selection, remove the losers
+  if remove:
+    for i in range(remove):
+      os.remove(folder + '/' + result[i][0])
+
+  result = result[remove:]
   # print(result[-10:])
   return result
 

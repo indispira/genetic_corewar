@@ -33,10 +33,10 @@ while epoch < epochs:
     generate_random(folder)
 
   # Evaluate each pool of champions and kill the losers
-  pool(pools, folder, remove)
+  # pool(pools, folder, remove)
 
   # Evaluate the pool winners against all stock
-  scores = evaluate_stock(folder, pools)
+  scores = evaluate_stock(folder, pools, remove * pools)
   if scores[-1][1] == stock:
     print('Reference score obtained')
     break
