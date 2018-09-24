@@ -1,5 +1,5 @@
 .name "mise_a_jour_windows95"
-.comment "Votre version de windows est obselete, votre mémoire vas être mise jour, veuillez ne pas eteindre vore ordinateur au risque de voir toutes vos donnees se faire ecrasées"
+.comment ""
 
 begin:
 live            %1
