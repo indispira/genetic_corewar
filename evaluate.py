@@ -31,6 +31,17 @@ def launch_evaluation_scores(p1, p2):
   res = subprocess.Popen(args, stdout=PIPE)
   return res.communicate()[0].decode('utf-8').splitlines()
 
+def launch_evaluation_cycles_timeout(p1, p2, timeout):
+  cmd = './corewar -v 2 ' + p1 + ' ' + p2
+  res = subprocess.Popen(shlex.split(cmd), stdout=PIPE)
+  timer = Timer(timeout, res.kill)
+  try:
+    timer.start()
+    result = res.communicate()[0].decode('utf-8').splitlines()
+  finally:
+    timer.cancel()
+    return result
+
 def get_population(folder):
   population = os.listdir(folder)
   scores = {}
@@ -121,6 +132,46 @@ def evaluate_stock(folder, pools, remove=0):
     before = time.time()
     for i in range(pools):
       p = Process(target=each_stock, args=(folder, pop[int(i * batch):int((i + 1) * batch)], scores,))
+      processes.append(p)
+      p.start()
+
+    for p in processes:
+      p.join()
+
+    result = sorted([(k, v) for k, v in scores.items()], key=lambda x: x[1])
+  # print('Evaluations against all stock done in', time.time() - before, 'seconds')
+
+  # If no pool selection, remove the losers
+  if remove:
+    for i in range(remove):
+      os.remove(folder + '/' + result[i][0])
+
+  result = result[remove:]
+  # print(result[-10:])
+  return result
+
+def each_stock_cycles(folder, pop, scores):
+  stk, _ = get_population('stock')
+  for p in pop:
+    scores[p] = 0.
+    p1 = folder + '/' + p
+    for s in stk:
+      p2 = 'stock/' + s
+      res = launch_evaluation_cycles_timeout(p1, p2, 5)
+      # print(res[-1])
+      if len(res) and res[-1][0] == 'C' and res[-1][11] == '1':
+        scores[p] += 1. + 1. / float(res[-2].split(' ')[-1])
+
+def evaluate_stock_cycles(folder, cores, remove=0):
+  pop, scores = get_population(folder)
+  ref, _ = get_population('stock')
+  batch = len(pop) / cores
+  processes = []
+  with Manager() as manager:
+    scores = manager.dict()
+    before = time.time()
+    for i in range(cores):
+      p = Process(target=each_stock_cycles, args=(folder, pop[int(i * batch):int((i + 1) * batch)], scores,))
       processes.append(p)
       p.start()
 
