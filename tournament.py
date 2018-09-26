@@ -47,6 +47,6 @@ while epoch < epochs:
   shutil.copytree(folder, 'pops/pop' + str(epoch + 1))
 
   epoch += 1
-  print('Epoch', epoch, '->', scores[-1][0], scores[-1][1], 'in', int(time.time() - epoch_time), 's')
+  print(epoch, '->', scores[-1][0], scores[-1][1], 'in', int(time.time() - epoch_time), 's')
 log.close()
 print('Training computed in', time.time() - init_time, 'seconds')
