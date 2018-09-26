@@ -5,7 +5,7 @@ import string
 import random
 import subprocess
 
-from mutation import mutate_v2
+from mutation import mutate_v2, shuffle_numbers
 from subprocess import Popen, PIPE
 
 def load_parents(folder):
@@ -63,6 +63,29 @@ def generate_child(folder, father, mother):
     for l in end:
       f.write(l + '\n')
 
+def crossover(folder, father, mother):
+  l = int(min(len(father), len(mother)) / 4)
+  son = father[:l] + mother[l:l * 2] + father[l * 2:l * 3] + mother[l * 3:l * 4] + father[l * 4:]
+  daughter = mother[:l] + father[l:l * 2] + mother[l * 2:l * 3] + father[l * 3:l * 4] + mother[l * 4:]
+
+  mutate = False if random.randint(0, 20) else True
+  name = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=40))
+  with open('childs/' + name + '.s', 'w') as f:
+    f.write('.name "%s"\n.comment ""\n\n' % name)
+    for line in son:
+      if mutate and not random.randint(0, 50):
+        line = shuffle_numbers(line)
+      f.write(line + '\n')
+
+  mutate = False if random.randint(0, 20) else True
+  name = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=40))
+  with open('childs/' + name + '.s', 'w') as f:
+    f.write('.name "%s"\n.comment ""\n\n' % name)
+    for line in daughter:
+      if mutate and not random.randint(0, 50):
+        line = shuffle_numbers(line)
+      f.write(line + '\n')
+
 def compile_childs(folder):
   childs = os.listdir('childs')
   for c in childs:
@@ -81,12 +104,13 @@ def reproduct_v2(folder, nb, scores):
   # Ponderate the chance to be parent following the score of each champion
   parents = os.listdir(folder)
   for s in scores:
-    for _ in range(s[1]):
+    for _ in range(int(s[1])):
       parents.append(s[0])
 
   for i in range(nb):
     father = random.randint(0, len(parents) - 1)
     mother = random.randint(0, len(parents) - 1)
-    generate_child(folder, redcode[parents[father]], redcode[parents[mother]])
+    # generate_child(folder, redcode[parents[father]], redcode[parents[mother]])
+    crossover(folder, redcode[parents[father]], redcode[parents[mother]])
 
   compile_childs(folder)
