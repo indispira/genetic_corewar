@@ -2,18 +2,19 @@ import os
 import time
 import shutil
 
-from evaluate import evaluate_stock, pool
+from evaluate import evaluate_stock, pool, evaluate_stock_cycles
 from generate import generate_random
 from reproduction import reproduct_v2
 
 # Fixed variables for the train
 size_pop = 80
 epochs = 1000
-pools = 8
+cores = 8
 stock = os.listdir('stock')
+
 newbies = int(0.1 * size_pop)
-remove = int(0.9 * size_pop / pools)
-childs = int(0.8 * size_pop)
+remove = int(0.9 * size_pop)
+childs = int(0.8 * size_pop / 2)
 
 # Initialization
 init_time = time.time()
@@ -32,11 +33,8 @@ while epoch < epochs:
   for i in range(size_pop - old_pop):
     generate_random(folder)
 
-  # Evaluate each pool of champions and kill the losers
-  # pool(pools, folder, remove)
-
   # Evaluate the pool winners against all stock
-  scores = evaluate_stock(folder, pools, remove * pools)
+  scores = evaluate_stock_cycles(folder, cores, remove)
   if scores[-1][1] == stock:
     print('Reference score obtained')
     break
