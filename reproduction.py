@@ -68,21 +68,21 @@ def crossover(folder, father, mother):
   son = father[:l] + mother[l:l * 2] + father[l * 2:l * 3] + mother[l * 3:l * 4] + father[l * 4:]
   daughter = mother[:l] + father[l:l * 2] + mother[l * 2:l * 3] + father[l * 3:l * 4] + mother[l * 4:]
 
-  mutate = False if random.randint(0, 20) else True
+  mutate = False if random.randint(0, 4) else True
   name = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=40))
   with open('childs/' + name + '.s', 'w') as f:
     f.write('.name "%s"\n.comment ""\n\n' % name)
     for line in son:
-      if mutate and not random.randint(0, 50):
+      if mutate and not random.randint(0, 24):
         line = shuffle_numbers(line)
       f.write(line + '\n')
 
-  mutate = False if random.randint(0, 20) else True
+  mutate = False if random.randint(0, 4) else True
   name = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=40))
   with open('childs/' + name + '.s', 'w') as f:
     f.write('.name "%s"\n.comment ""\n\n' % name)
     for line in daughter:
-      if mutate and not random.randint(0, 50):
+      if mutate and not random.randint(0, 24):
         line = shuffle_numbers(line)
       f.write(line + '\n')
 
