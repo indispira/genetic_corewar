@@ -158,9 +158,11 @@ def each_stock_cycles(folder, pop, scores):
     for s in stk:
       p2 = 'stock/' + s
       res = launch_evaluation_cycles_timeout(p1, p2, 5)
-      # print(res[-1])
-      if len(res) and res[-1][0] == 'C' and res[-1][11] == '1':
-        scores[p] += 1. + 1. / float(res[-2].split(' ')[-1])
+      if len(res):
+        winner = res[-1] if 'Contestant' in res[-1] else res[-2]
+        cycle = res[-2] if 'It' in res[-2] else res[-3]
+        if winner[11] == '1':
+          scores[p] += 1 + (1 / float(cycle.split(' ')[-1]))
 
 def evaluate_stock_cycles(folder, cores, remove=0):
   pop, scores = get_population(folder)
