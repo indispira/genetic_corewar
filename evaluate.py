@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import shlex
+import shutil
 import subprocess
 
 from threading import Timer
@@ -26,7 +27,7 @@ def get_population(folder):
     scores[people] = 0
   return population, scores
 
-def each_eval_cycles(folder, target, pop, scores):
+def each_eval_cycles(folder, target, pop, scores, defeats):
   tgt, _ = get_population(target)
   for p in pop:
     scores[p] = 0.
@@ -39,17 +40,21 @@ def each_eval_cycles(folder, target, pop, scores):
         cycle = res[-2] if 'It' in res[-2] else res[-3]
         if winner[11] == '1':
           scores[p] += 1 + (1 / float(cycle.split(' ')[-1]))
+          defeats[t] += 1
 
 def mp_eval_cycles(folder, target, cores, remove=0):
   pop, scores = get_population(folder)
-  ref, _ = get_population(target)
+  tgt, _ = get_population(target)
   batch = len(pop) / cores
   processes = []
   with Manager() as manager:
     scores = manager.dict()
+    defeats = manager.dict()
+    for t in tgt:
+      defeats[t] = 0
     before = time.time()
     for i in range(cores):
-      p = Process(target=each_eval_cycles, args=(folder, target, pop[int(i * batch):int((i + 1) * batch)], scores,))
+      p = Process(target=each_eval_cycles, args=(folder, target, pop[int(i * batch):int((i + 1) * batch)], scores, defeats,))
       processes.append(p)
       p.start()
 
@@ -57,6 +62,8 @@ def mp_eval_cycles(folder, target, cores, remove=0):
       p.join()
 
     result = sorted([(k, v) for k, v in scores.items()], key=lambda x: x[1])
+    print(defeats)
+    weaks = defeats.copy()
 
   # Remove the losers
   if remove:
@@ -64,4 +71,22 @@ def mp_eval_cycles(folder, target, cores, remove=0):
       os.remove(folder + '/' + result[i][0])
 
   result = result[remove:]
-  return result
+  return result, weaks
+
+def break_time(weaks, old_weaks, size, pause, break_list):
+  new_weaks = {}
+  for w in weaks:
+    if weaks[w] > int(size * 0.9) and old_weaks[w] > int(size * 0.9): 
+      shutil.move('stock/' + w, 'break/' + w)
+      break_list[w] = pause
+    else:
+      new_weaks[w] = weaks[w]
+  return new_weaks, break_list
+
+def recovered(break_list):
+  for b in break_list:
+    if not break_list[b]:
+      shutil.move('break/' + b, 'stock/' + b)
+    else:
+      break_list[b] -= 1
+  return break_list

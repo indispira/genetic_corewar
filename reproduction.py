@@ -24,7 +24,7 @@ def mutate_line(line):
     op, code = line.split('\t')
     op = 'op_' + op
     line, _ = getattr(generate, op)(0)
-  return line
+  return line[:-1]
 
 def crossover(folder, father, mother):
   l = int(min(len(father), len(mother)) / 4)
