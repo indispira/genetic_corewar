@@ -5,7 +5,6 @@ import string
 import random
 import subprocess
 
-from evaluate import evaluate_test
 from subprocess import Popen, PIPE
 
 size_max = 650
