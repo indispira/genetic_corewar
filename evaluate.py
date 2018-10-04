@@ -62,7 +62,6 @@ def mp_eval_cycles(folder, target, cores, remove=0):
       p.join()
 
     result = sorted([(k, v) for k, v in scores.items()], key=lambda x: x[1])
-    print(defeats)
     weaks = defeats.copy()
 
   # Remove the losers
@@ -76,7 +75,7 @@ def mp_eval_cycles(folder, target, cores, remove=0):
 def break_time(weaks, old_weaks, size, pause, break_list):
   new_weaks = {}
   for w in weaks:
-    if weaks[w] > int(size * 0.9) and old_weaks[w] > int(size * 0.9): 
+    if weaks[w] >= int(size * 0.9) and old_weaks.get(w, None) and old_weaks[w] >= int(size * 0.9): 
       shutil.move('stock/' + w, 'break/' + w)
       break_list[w] = pause
     else:
@@ -87,6 +86,5 @@ def recovered(break_list):
   for b in break_list:
     if not break_list[b]:
       shutil.move('break/' + b, 'stock/' + b)
-    else:
-      break_list[b] -= 1
+    break_list[b] -= 1
   return break_list

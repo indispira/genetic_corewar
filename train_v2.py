@@ -13,9 +13,9 @@ cores = 8
 pause = 10
 stock = os.listdir('stock')
 
-newbies = 1#int(0.1 * size_pop)
-remove = 7#int(0.9 * size_pop)
-childs = 3#int(0.8 * size_pop / 2)
+newbies = int(0.1 * size_pop)
+remove = int(0.9 * size_pop)
+childs = int(0.8 * size_pop / 2)
 
 # Initialization
 epoch = 0
@@ -41,7 +41,7 @@ while epoch < epochs:
     print('Reference score obtained')
     break
   log.write('Epoch ' + str(epoch) + ' -> ' + scores[-1][0] + ' ' + str(scores[-1][1]) + '\n')
-  print(epoch, '->', scores[-1][0], scores[-1][1], len(os.listdir('stock')), 'in', int(time.time() - epoch_time), 's')
+  print(epoch, '-', scores[-1][0][:-4], scores[-1][1] + len(os.listdir('break'), 'in', int(time.time() - epoch_time), 's')
 
   # Check if some champions have recovered
   break_list = recovered(break_list)
