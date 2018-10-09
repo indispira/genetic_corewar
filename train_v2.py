@@ -13,6 +13,10 @@ cores = 8
 pause = 10
 stock = os.listdir('stock')
 
+# Break_time is an optimisation of compute time usefull for a training
+# in one time, but can compromise the learning in multiple steps
+break_opti = False
+
 newbies = int(0.1 * size_pop)
 remove = int(0.9 * size_pop)
 childs = int(0.8 * size_pop / 2)
@@ -41,13 +45,15 @@ while epoch < epochs:
     print('Reference score obtained')
     break
   log.write('Epoch ' + str(epoch) + ' -> ' + scores[-1][0] + ' ' + str(scores[-1][1]) + '\n')
-  print(epoch, '-', scores[-1][0][:-4], scores[-1][1] + len(os.listdir('break'), 'in', int(time.time() - epoch_time), 's')
+  print(epoch, '-', scores[-1][0][:-4], scores[-1][1] + len(os.listdir('break')), 'in', int(time.time() - epoch_time), 's')
 
   # Check if some champions have recovered
-  break_list = recovered(break_list)
+  if break_opti:
+    break_list = recovered(break_list)
 
   # Remove champions losing too much and give it a break time of some epochs
-  old_weaks, break_list = break_time(weaks, old_weaks, size_pop, pause, break_list)
+  if break_opti:
+    old_weaks, break_list = break_time(weaks, old_weaks, size_pop, pause, break_list)
 
   # Generate childs from winners
   reproduction(folder, childs, scores)
