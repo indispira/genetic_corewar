@@ -42,8 +42,10 @@ def each_eval_cycles(folder, target, pop, scores, defeats):
           scores[p] += 1 + (1 / float(cycle.split(' ')[-1]))
           defeats[t] += 1
 
-def mp_eval_cycles(folder, target, cores, remove=0):
-  pop, scores = get_population(folder)
+def mp_eval_cycles(folder, target, cores, old_results, remove=0):
+  all_pop, scores = get_population(folder)
+  old_winners = [w[0] for w in old_results]
+  pop = [p for p in all_pop if p not in old_winners]
   tgt, _ = get_population(target)
   batch = len(pop) / cores
   processes = []
@@ -61,6 +63,8 @@ def mp_eval_cycles(folder, target, cores, remove=0):
     for p in processes:
       p.join()
 
+    for r in old_results:
+      scores[r[0]] = r[1]
     result = sorted([(k, v) for k, v in scores.items()], key=lambda x: x[1])
     weaks = defeats.copy()
 
@@ -71,20 +75,3 @@ def mp_eval_cycles(folder, target, cores, remove=0):
 
   result = result[remove:]
   return result, weaks
-
-def break_time(weaks, old_weaks, size, pause, break_list):
-  new_weaks = {}
-  for w in weaks:
-    if weaks[w] >= int(size * 0.9) and old_weaks.get(w, None) and old_weaks[w] >= int(size * 0.9): 
-      shutil.move('stock/' + w, 'break/' + w)
-      break_list[w] = pause
-    else:
-      new_weaks[w] = weaks[w]
-  return new_weaks, break_list
-
-def recovered(break_list):
-  for b in break_list:
-    if not break_list[b]:
-      shutil.move('break/' + b, 'stock/' + b)
-    break_list[b] -= 1
-  return break_list

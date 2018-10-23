@@ -26,6 +26,36 @@ def mutate_line(line):
     line, _ = getattr(generate, op)(0)
   return line[:-1]
 
+def crossover_v2(folder, father, mother):
+  parts = random.randint(2, 9)
+  l = int(min(len(father), len(mother)) / parts)
+
+  son = []
+  daughter = []
+  for i in range(parts):
+    son += father[i * l:(i + 1) * l] if i % 2 else mother[i * l:(i + 1) * l]
+    daughter += mother[i * l:(i + 1) * l] if i % 2 else father[i * l:(i + 1) * l]
+  son += father[len(son):]
+  daughter += mother[len(daughter):]
+
+  mutate = False if random.randint(0, 4) else True
+  name = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=40))
+  with open('childs/' + name + '.s', 'w') as f:
+    f.write('.name "%s"\n.comment ""\n\n' % name)
+    for line in son:
+      if mutate and not random.randint(0, 24):
+        line = mutate_line(line)
+      f.write(line + '\n')
+
+  mutate = False if random.randint(0, 4) else True
+  name = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=40))
+  with open('childs/' + name + '.s', 'w') as f:
+    f.write('.name "%s"\n.comment ""\n\n' % name)
+    for line in daughter:
+      if mutate and not random.randint(0, 24):
+        line = mutate_line(line)
+      f.write(line + '\n')  
+
 def crossover(folder, father, mother):
   l = int(min(len(father), len(mother)) / 4)
   son = father[:l] + mother[l:l * 2] + father[l * 2:l * 3] + mother[l * 3:l * 4] + father[l * 4:]
@@ -73,6 +103,6 @@ def reproduction(folder, nb, scores):
   for i in range(nb):
     father = random.randint(0, len(parents) - 1)
     mother = random.randint(0, len(parents) - 1)
-    crossover(folder, redcode[parents[father]], redcode[parents[mother]])
+    crossover_v2(folder, redcode[parents[father]], redcode[parents[mother]])
 
   compile_childs(folder)
