@@ -233,3 +233,20 @@ def eval_victory(p1, p2, timeout=3600):
   finally:
     timer.cancel()
     return result
+
+def break_time(weaks, old_weaks, size, pause, break_list):
+  new_weaks = {}
+  for w in weaks:
+    if weaks[w] >= int(size * 0.9) and old_weaks.get(w, None) and old_weaks[w] >= int(size * 0.9): 
+      shutil.move('stock/' + w, 'break/' + w)
+      break_list[w] = pause
+    else:
+      new_weaks[w] = weaks[w]
+  return new_weaks, break_list
+
+def recovered(break_list):
+  for b in break_list:
+    if not break_list[b]:
+      shutil.move('break/' + b, 'stock/' + b)
+    break_list[b] -= 1
+  return break_list

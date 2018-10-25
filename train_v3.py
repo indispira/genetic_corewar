@@ -7,10 +7,11 @@ from generate import generate_random
 from reproduction import reproduction
 
 # Fixed variables for the train
-size_pop = 80
-epochs = 1000
 cores = 8
-stock = os.listdir('stock')
+size_pop = 40 * cores
+epochs = 1000
+stock_folder = 'refs'
+stock = os.listdir('refs')
 
 newbies = int(0.1 * size_pop)
 remove = int(0.9 * size_pop)
@@ -34,8 +35,9 @@ while epoch < epochs:
     generate_random(folder)
 
   # Evaluate the pool winners against all stock
-  scores, _ = mp_eval_cycles(folder, 'stock', cores, scores, remove)
-  if scores[-1][1] == len(stock):
+  scores, _ = mp_eval_cycles(folder, 'refs', cores, scores, remove)
+  print(scores)
+  if scores[-1][1] > len(stock):
     print('Maximum score obtained')
     break
   log.write('Epoch ' + str(epoch) + ' -> ' + scores[-1][0] + ' ' + str(scores[-1][1]) + '\n')
