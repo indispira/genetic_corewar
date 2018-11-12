@@ -196,4 +196,4 @@ def generate_random(folder):
 
   # Move .s file to the archives
   shutil.move(folder + '/' + name + '.s', 'newbies/' + name + '.s')
-  return True
+  return name

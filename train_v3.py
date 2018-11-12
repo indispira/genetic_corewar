@@ -8,9 +8,9 @@ from reproduction import reproduction
 
 # Fixed variables for the train
 cores = 8
-size_pop = 80 * cores
+size_pop = 10 * cores
 epochs = 1000
-stock_folder = 'refs'
+stock_folder = 'stock'
 stock = os.listdir(stock_folder)
 
 newbies = int(0.1 * size_pop)
