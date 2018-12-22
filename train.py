@@ -10,8 +10,8 @@ from reproduction import reproduction
 # Fixed variables for the train
 # You can customize depending of your needs
 cores = multiprocessing.cpu_count()
-size_pop = 10 * cores
-epochs = 1000
+size_pop = 100 * cores
+epochs = 200
 stock_folder = 'stock'
 stock = os.listdir(stock_folder)
 
