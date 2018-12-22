@@ -1,62 +1,54 @@
 import os
 import time
 import shutil
+import multiprocessing
 
-from mutation import mutate
-from reproduction import reproduct
+from evaluate import mp_eval_cycles
 from generate import generate_random
-from evaluate import evaluate_active, evaluate_reference, evaluate_stock, evaluate_cycles
+from reproduction import reproduction
 
-size_pop = 1000
-epochs = 2000
-evaluate_function = evaluate_reference
+# Fixed variables for the train
+# You can customize depending of your needs
+cores = multiprocessing.cpu_count()
+size_pop = 10 * cores
+epochs = 1000
+stock_folder = 'stock'
+stock = os.listdir(stock_folder)
 
-newbies = 0.1 * size_pop
-remove = 0.7 * size_pop
-childs = 0.3 * size_pop
+newbies = int(0.1 * size_pop)
+remove = int(0.9 * size_pop)
+childs = int(0.8 * size_pop / 2)
 
 # Initialization
-init_time = time.time()
-step = 0
+epoch = 0
+scores = []
 folder = 'pops/pop0'
+log = open('log', 'w')
+init_time = time.time()
 
-# Generate the first population if needed
-old_pop = len(os.listdir(folder))
-for i in range(size_pop - old_pop):
-  generate_random(folder)
-
-# Loop for training
-for i in range(epochs):
+# Loop on epochs
+while epoch < epochs:
   epoch_time = time.time()
-  folder = 'pops/pop' + str(i)
+  folder = 'pops/pop' + str(epoch)
 
-  # Transfer of the population to the next
-  if i != 0:
-    shutil.copytree('pops/pop' + str(i - 1), folder)
-
-  # Evaluate the population
-  results = evaluate_function(folder)
-
-  # Delete the losers
-  for j, k in enumerate(results):
-    if j == int(remove):
-      break
-    os.remove(folder + '/' + k[0])
-
-  # Evaluate against all references of champions to stop
-  if evaluate_stock(folder, results[-1][0]):
-    print('Reference score obtained')
-    break
-
-  # Reproduct the best ones
-  reproduct(folder, childs)
-
-  # Mutate some childs
-  mutate(folder)
-  # Add some fresh generated
-  for j in range(int(newbies)):
+  # Fill the population with random newbies
+  old_pop = len(os.listdir(folder))
+  for i in range(size_pop - old_pop):
     generate_random(folder)
 
-  print('Epoch', i, 'computed in', time.time() - epoch_time, 'seconds')
+  # Evaluate the pool winners against all stock
+  scores, _ = mp_eval_cycles(folder, stock_folder, cores, scores, remove)
+  if scores[-1][1] > len(stock):
+    print('Maximum score obtained')
+    break
+  log.write('Epoch ' + str(epoch) + ' -> ' + scores[-1][0] + ' ' + str(scores[-1][1]) + '\n')
+  print(epoch, '-', scores[-1][0][:-4], scores[-1][1], 'in', int(time.time() - epoch_time), 's')
+
+  # Generate childs and mutants from winners
+  reproduction(folder, childs, scores)
+
+  # Transfer the current population to the next population
+  shutil.copytree(folder, 'pops/pop' + str(epoch + 1))
+  epoch += 1
+log.close()
 print('Training computed in', time.time() - init_time, 'seconds')
-print('Champion generated:', results[-1][0])
